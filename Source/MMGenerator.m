@@ -84,6 +84,47 @@ static NSString * __HTMLStartTagForElement(MMElement *anElement)
     {
         case MMElementTypeHeader:
             return [NSString stringWithFormat:@"<h%u>", (unsigned int)anElement.level];
+        case MMElementTypeImage:
+            if ([anElement.href isEqualToString:@"audio"])
+            {
+                // This is an audio file.
+                if (anElement.title != nil) {
+                    // A title has been set.
+                    return [NSString stringWithFormat:@"<div class='audio'><h3>%@</h3>\n%@\n</div>",
+                            __HTMLEscapedString(anElement.title),
+                            __HTMLEscapedString(anElement.stringValue)];
+                }
+                else {
+                    // No title has been set.
+                    return [NSString stringWithFormat:@"<div class='audio'><h3>Audio</h3>\n%@\n</div>",
+                            __HTMLEscapedString(anElement.stringValue)];
+                }
+            }
+            if ([anElement.href isEqualToString:@"quiz"])
+            {
+                // This is a quiz.
+                if (anElement.title != nil) {
+                    // A quiz title has been set.
+                    return [NSString stringWithFormat:@"<div class='quiz'><h3>%@</h3>\n%@\n</div>",
+                            __HTMLEscapedString(anElement.title),
+                            __HTMLEscapedString(anElement.stringValue)];
+                }
+                else {
+                    // No quiz title has been set.
+                    return [NSString stringWithFormat:@"<div class='quiz'><h3>Quiz</h3>\n%@\n</div>",
+                            __HTMLEscapedString(anElement.stringValue)];
+                }
+            }
+            else if (anElement.title != nil)
+            {
+                return [NSString stringWithFormat:@"<img src=\"%@\" alt=\"%@\" title=\"%@\" />",
+                        __HTMLEscapedString(anElement.href),
+                        __HTMLEscapedString(anElement.stringValue),
+                        __HTMLEscapedString(anElement.title)];
+            }
+            return [NSString stringWithFormat:@"<img src=\"%@\" alt=\"%@\" />",
+                    __HTMLEscapedString(anElement.href),
+                    __HTMLEscapedString(anElement.stringValue)];
         case MMElementTypeParagraph:
             return @"<p>";
         case MMElementTypeBulletedList:
@@ -108,17 +149,6 @@ static NSString * __HTMLStartTagForElement(MMElement *anElement)
             return @"<em>";
         case MMElementTypeCodeSpan:
             return @"<code>";
-        case MMElementTypeImage:
-            if (anElement.title != nil)
-            {
-                return [NSString stringWithFormat:@"<img src=\"%@\" alt=\"%@\" title=\"%@\" />",
-                        __HTMLEscapedString(anElement.href),
-                        __HTMLEscapedString(anElement.stringValue),
-                        __HTMLEscapedString(anElement.title)];
-            }
-            return [NSString stringWithFormat:@"<img src=\"%@\" alt=\"%@\" />",
-                    __HTMLEscapedString(anElement.href),
-                    __HTMLEscapedString(anElement.stringValue)];
         case MMElementTypeLink:
             if (anElement.title != nil)
             {
