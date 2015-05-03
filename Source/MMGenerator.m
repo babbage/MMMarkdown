@@ -82,25 +82,29 @@ static NSString * __HTMLStartTagForElement(MMElement *anElement)
 {
     switch (anElement.type)
     {
-        case MMElementTypeHeader:
-            return [NSString stringWithFormat:@"<h%u>", (unsigned int)anElement.level];
         case MMElementTypeImage:
-            if ([anElement.href isEqualToString:@"audio"])
+            if ([anElement.href hasPrefix:@"link:"])
             {
-                // This is an audio file.
+                return [NSString stringWithFormat:@"<div class='link'><h3>In-App Link</h3>\n%@\n</div>",
+                    __HTMLEscapedString(anElement.stringValue)];
+            }
+            else if ([anElement.href isEqualToString:@"audio"] || [anElement.href isEqualToString:@"image"] || [anElement.href isEqualToString:@"video"] || [anElement.href isEqualToString:@"animation"])
+            {
+                // This is a media file.
                 if (anElement.title != nil) {
                     // A title has been set.
-                    return [NSString stringWithFormat:@"<div class='audio'><h3>%@</h3>\n%@\n</div>",
+                    return [NSString stringWithFormat:@"<div class='media'><h3>%@</h3>\n%@\n</div>",
                             __HTMLEscapedString(anElement.title),
                             __HTMLEscapedString(anElement.stringValue)];
                 }
                 else {
                     // No title has been set.
-                    return [NSString stringWithFormat:@"<div class='audio'><h3>Audio</h3>\n%@\n</div>",
+                    return [NSString stringWithFormat:@"<div class='media'><h3>%@</h3>\n%@\n</div>",
+                            __HTMLEscapedString(anElement.href),
                             __HTMLEscapedString(anElement.stringValue)];
                 }
             }
-            if ([anElement.href isEqualToString:@"quiz"])
+            else if ([anElement.href isEqualToString:@"quiz"])
             {
                 // This is a quiz.
                 if (anElement.title != nil) {
@@ -125,6 +129,8 @@ static NSString * __HTMLStartTagForElement(MMElement *anElement)
             return [NSString stringWithFormat:@"<img src=\"%@\" alt=\"%@\" />",
                     __HTMLEscapedString(anElement.href),
                     __HTMLEscapedString(anElement.stringValue)];
+        case MMElementTypeHeader:
+            return [NSString stringWithFormat:@"<h%u>", (unsigned int)anElement.level];
         case MMElementTypeParagraph:
             return @"<p>";
         case MMElementTypeBulletedList:
