@@ -674,7 +674,7 @@
 		BE813DCD14F893EB00EC9469 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0630;
+				LastUpgradeCheck = 0700;
 			};
 			buildConfigurationList = BE813DD014F893EB00EC9469 /* Build configuration list for PBXProject "MMMarkdown" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -818,6 +818,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
@@ -905,6 +906,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Source/MMMarkdown-Prefix.pch";
 				INFOPLIST_FILE = "Tests/MMMarkdownTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.diephouse.matt.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -920,6 +922,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Source/MMMarkdown-Prefix.pch";
 				INFOPLIST_FILE = "Tests/MMMarkdownTests-Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.diephouse.matt.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
