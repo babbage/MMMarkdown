@@ -44,6 +44,8 @@ static NSString * __MMStringFromElementType(MMElementType type)
             return @"ul";
         case MMElementTypeListItem:
             return @"li";
+        case MMElementTypeQuizBlock:
+            return @"div";
         case MMElementTypeCodeBlock:
             return @"code";
         case MMElementTypeHorizontalRule:

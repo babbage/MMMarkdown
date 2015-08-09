@@ -106,7 +106,8 @@ static NSString * __HTMLStartTagForElement(MMElement *anElement)
             }
             else if ([anElement.href isEqualToString:@"quiz"])
             {
-                // This is a quiz.
+                // This is a single-line link quiz.
+                // See also Quiz Block below.
                 if (anElement.title != nil) {
                     // A quiz title has been set.
                     return [NSString stringWithFormat:@"<div class='quiz'><h3>%@</h3>\n%@\n</div>",
@@ -141,6 +142,15 @@ static NSString * __HTMLStartTagForElement(MMElement *anElement)
             return @"<li>";
         case MMElementTypeBlockquote:
             return @"<blockquote>\n";
+        case MMElementTypeQuizBlock:
+            if (anElement.title != nil) {
+                // A quiz title has been set.
+                return [NSString stringWithFormat:@"<div class='quiz'><h3>%@</h3>\n",
+                        __HTMLEscapedString(anElement.title)];
+            } else {
+                // No quiz title has been set.
+                return [NSString stringWithFormat:@"<div class='quiz'><h3>Quiz</h3>\n"];
+            }
         case MMElementTypeCodeBlock:
           return anElement.language ? [NSString stringWithFormat:@"<pre><code class=\"%@\">", anElement.language] : @"<pre><code>";
         case MMElementTypeLineBreak:
@@ -205,6 +215,8 @@ static NSString * __HTMLEndTagForElement(MMElement *anElement)
             return @"</li>\n";
         case MMElementTypeBlockquote:
             return @"</blockquote>\n";
+        case MMElementTypeQuizBlock:
+            return @"</div>\n";
         case MMElementTypeCodeBlock:
             return @"</code></pre>\n";
         case MMElementTypeStrikethrough:

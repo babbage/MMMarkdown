@@ -40,6 +40,7 @@ typedef NS_OPTIONS(NSUInteger, MMMarkdownExtensions)
 //    MMMarkdownExtensionsTableCaptions       = 1 << 7,
     MMMarkdownExtensionsTables              = 1 << 8,
     MMMarkdownExtensionsUnderscoresInWords  = 1 << 9,
+    MMMarkdownExtensionsQuizBlocks          = 1 << 10,
     
     MMMarkdownExtensionsGitHubFlavored = MMMarkdownExtensionsAutolinkedURLs|MMMarkdownExtensionsFencedCodeBlocks|MMMarkdownExtensionsHardNewlines|MMMarkdownExtensionsStrikethroughs|MMMarkdownExtensionsTables|MMMarkdownExtensionsUnderscoresInWords,
 };

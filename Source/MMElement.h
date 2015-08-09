@@ -35,6 +35,7 @@ typedef enum
     MMElementTypeNumberedList,
     MMElementTypeBulletedList,
     MMElementTypeListItem,
+    MMElementTypeQuizBlock,
     MMElementTypeCodeBlock,
     MMElementTypeHorizontalRule,
     MMElementTypeHTML,

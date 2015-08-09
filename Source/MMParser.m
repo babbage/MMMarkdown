@@ -242,6 +242,15 @@ static NSString * __HTMLEntityForCharacter(unichar character)
     if (element)
         return element;
     
+    if (self.extensions & MMMarkdownExtensionsQuizBlocks)
+    {
+        [scanner beginTransaction];
+        element = [self _parseQuizBlockWithScanner:scanner];
+        [scanner commitTransaction:element != nil];
+        if (element)
+            return element;
+    }
+    
     if (self.extensions & MMMarkdownExtensionsFencedCodeBlocks)
     {
         [scanner beginTransaction];
@@ -474,6 +483,57 @@ static NSString * __HTMLEntityForCharacter(unichar character)
     return element;
 }
 
+- (NSArray *)_parseQuizLinesWithScanner:(MMScanner *)scanner
+{
+    NSMutableArray *children = [NSMutableArray new];
+    
+    // This code provides a filtering mechanism, should one be
+    // required, based on the code line filter. Currently,
+    // no filtering is being applied as entities string is empty.
+    NSCharacterSet *entities    = [NSCharacterSet characterSetWithCharactersInString:@""];
+    NSCharacterSet *nonEntities = [entities invertedSet];
+    
+    while (!scanner.atEndOfString)
+    {
+        NSUInteger textLocation = scanner.location;
+        
+        [scanner skipCharactersFromSet:nonEntities];
+        
+        if (textLocation != scanner.location)
+        {
+            MMElement *text = [MMElement new];
+            text.type  = MMElementTypeNone;
+            text.range = NSMakeRange(textLocation, scanner.location-textLocation);
+            [children addObject:text];
+        }
+        
+        // Add the entity
+        if (!scanner.atEndOfLine)
+        {
+            unichar character = [scanner.string characterAtIndex:scanner.location];
+            MMElement *entity    = [MMElement new];
+            entity.type  = MMElementTypeEntity;
+            entity.range = NSMakeRange(scanner.location, 1);
+            entity.stringValue = __HTMLEntityForCharacter(character);
+            [children addObject:entity];
+            [scanner advance];
+        }
+        
+        if (scanner.atEndOfLine)
+        {
+            [scanner advanceToNextLine];
+            
+            // Add a newline
+            MMElement *newline = [MMElement new];
+            newline.type  = MMElementTypeLineBreak;
+            newline.range = NSMakeRange(0, 0);
+            [children addObject:newline];
+        }
+    }
+    
+    return children;
+}
+
 - (NSArray *)_parseCodeLinesWithScanner:(MMScanner *)scanner
 {
     NSMutableArray *children = [NSMutableArray new];
@@ -589,6 +649,53 @@ static NSString * __HTMLEntityForCharacter(unichar character)
     {
         MMScanner *innerScanner = [MMScanner scannerWithString:scanner.string lineRanges:element.innerRanges];
         element.children = [self _parseCodeLinesWithScanner:innerScanner];
+    }
+    
+    return element;
+}
+
+- (MMElement *)_parseQuizBlockWithScanner:(MMScanner *)scanner
+{
+    if (![scanner matchString:@"---QUIZ---"])
+        return nil;
+    
+    // skip additional backticks and language
+    [scanner skipWhitespace];
+    NSString *language = [scanner nextWord];
+    scanner.location += language.length;
+    [scanner skipWhitespace];
+    if (!scanner.atEndOfLine)
+        return nil;
+    [scanner advanceToNextLine];
+    
+    MMElement *element = [MMElement new];
+    element.type  = MMElementTypeQuizBlock;
+    element.language = (language.length == 0 ? nil : language);
+    
+    // block ends when it hints a line starting with ``` or the end of the string
+    while (!scanner.atEndOfString)
+    {
+        [scanner beginTransaction];
+        if ([scanner matchString:@"---"])
+        {
+            [scanner skipWhitespace];
+            if (scanner.atEndOfLine)
+            {
+                [scanner commitTransaction:YES];
+                break;
+            }
+        }
+        [scanner commitTransaction:NO];
+        [element addInnerRange:scanner.currentRange];
+        [scanner advanceToNextLine];
+    }
+    
+    [scanner advanceToNextLine];
+    
+    if (element.innerRanges.count > 0)
+    {
+        MMScanner *innerScanner = [MMScanner scannerWithString:scanner.string lineRanges:element.innerRanges];
+        element.children = [self _parseQuizLinesWithScanner:innerScanner];
     }
     
     return element;
